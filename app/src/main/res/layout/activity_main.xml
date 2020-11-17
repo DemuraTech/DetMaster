@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation = "vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:layout_marginTop="30pt"
+    >
+
+
+    <TextView
+        android:id = "@+id/tvPrev"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text = "Выберите, что вы хотите определить."
+        android:gravity = "center_horizontal" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Птиц"
+        android:layout_margin="5dp"
+        android:id = "@+id/btnBird"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Зверей"
+        android:layout_margin="5dp"
+        android:id = "@+id/btnAnimal"/>
+
+    <Button
+        android:id="@+id/btnTheory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:enabled="false"
+        android:text="Теория"/>
+
+
+
+</LinearLayout>
