@@ -52,8 +52,6 @@ public class DetMain extends AppCompatActivity {
             super.onBackPressed();
         });
 
-        // todo превышение 100 строк, у меня на экране строка не помещается
-
         tvPrev.setText(dataFromBase.previewText());
         registerForContextMenu(tvProgress);
     }
@@ -61,9 +59,15 @@ public class DetMain extends AppCompatActivity {
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        ArrayList<String> list = dataFromBase.getStringList();
-        for (String i : list) {
-            menu.add(0, list.indexOf(i)+1, 0, i);
+        // todo D in SOLID principles
+        // опираемся на интерфейсы и абстракции вместо реализаций
+        // List - абстракция, ArrayList - реализация
+        // Если будет List то можно легко ArrayList заменить на LinkedList
+        ArrayList<String> contextMenuData = dataFromBase.getStringList();
+
+        for (int i = 0; i < contextMenuData.size(); i++) {
+            // todo если все таки нужен индекс то лучше обычный for
+            menu.add(0, i + 1, 0, contextMenuData.get(i));
         }
     }
 

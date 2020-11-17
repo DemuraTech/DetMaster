@@ -1,5 +1,6 @@
 package tech.demura.detmaster;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -8,6 +9,7 @@ import android.view.MenuItem;
 
 import java.util.ArrayList;
 
+@SuppressLint("DefaultLocale")
 public class DataFromBase {
     private static int
             ID_INDEX,
@@ -21,6 +23,8 @@ public class DataFromBase {
             SPECIES_INDEX,
             SIGN_INDEX,
             IMAGE_PATH_INDEX;
+
+    // todo static?
     private static int
             id = 1,
             group1,
@@ -39,13 +43,14 @@ public class DataFromBase {
     DataFromBase(Context current) {
         context = current;
         dbHelper = new DBHelper(context);
-        ///Прописать создание в class Aplication через наследника
+        // todo Прописать создание в class Application через наследника
         dbHelper.createDB();
         db = dbHelper.openBase();
 
         cursor = db.query(DBHelper.TABLE, null, null, null, null, null, null);
         cursor.moveToFirst();
 
+        // todo почему не перенести присвоение начальных значений выше?
         id = 1;
         group_id = 1;
         if_not = 0;
@@ -55,6 +60,7 @@ public class DataFromBase {
         genus = 0;
         species = 0;
 
+        //todo получение самого первого значения?
         ID_INDEX = cursor.getColumnIndex(DBHelper.ID);
         GROUP1_INDEX = cursor.getColumnIndex(DBHelper.GROUP1);
         GROUP_ID_INDEX = cursor.getColumnIndex(DBHelper.GROUP_ID);
@@ -68,6 +74,7 @@ public class DataFromBase {
         IMAGE_PATH_INDEX = cursor.getColumnIndex(DBHelper.IMAGE_PATH);
     }
 
+    //todo group1 = group2? при этом метод называется setGroup1
     public void setGroup1(int group2) {
         Log.d("log", "setGroup1 starting");
         group1 = group2;
@@ -160,6 +167,7 @@ public class DataFromBase {
         return preText + progress;
     }
 
+
     public String previewText() {
         Log.d("log", "previewText starting");
         String result = "", query = "";
@@ -178,6 +186,7 @@ public class DataFromBase {
         return result;
     }
 
+    @SuppressLint("DefaultLocale")
     public ArrayList<String> getStringList() {
         Log.d("log", "getStringList starting");
 

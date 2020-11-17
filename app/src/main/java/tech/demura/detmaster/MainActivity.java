@@ -18,8 +18,10 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     // todo нужны ли здесь поля?
-    Button btnBird, btnAnimal, btnTree;
-    // todo почему статик?
+    Button btnAnimal, btnTree;
+
+    // todo в строку с переносами перечислять не принято, да и вроде не очень практично
+    //  лучше отдельными объявлениями
     final String
             valueOfAnimals = "1",
             valueOfBirds = "2",
@@ -30,16 +32,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btnBird = findViewById(R.id.btnBird);
+
+        // todo: объявления всегда лучше переносить к месту использования
+        //  https://habr.com/ru/post/59570/ правило 1
         btnAnimal = findViewById(R.id.btnAnimal);
         btnTree = findViewById(R.id.btnTheory);
 
+        Button btnBird = findViewById(R.id.btnBird);
         btnBird.setOnClickListener(view -> {
             Intent intent = new Intent(this, DetMain.class);
             intent.putExtra(group, valueOfBirds);
             startActivity(intent);
         });
 
+
+        //todo может быть достаточно будет как я исправил выше?
         btnAnimal.setOnClickListener(view -> {
             Intent intent = new Intent(this, DetMain.class);
             intent.putExtra(group, valueOfAnimals);
