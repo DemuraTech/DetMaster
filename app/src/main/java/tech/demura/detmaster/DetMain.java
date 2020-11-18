@@ -32,22 +32,24 @@ public class DetMain extends AppCompatActivity {
 
         tvPrev = findViewById(R.id.tvPrev);
         tvProgress = findViewById(R.id.tvProgress);
-        btnYes = findViewById(R.id.btnYes);
-        btnNo = findViewById(R.id.btnNo);
-        ivResult = findViewById(R.id.ivResult);
         tvResult = findViewById(R.id.tvResult);
-        btnResult = findViewById(R.id.btnResult);
+        ivResult = findViewById(R.id.ivResult);
+
         dataFromBase = new DataFromBase(this);
         Intent intent = getIntent();
-
         dataFromBase.setGroup1(Integer.parseInt(intent.getStringExtra("group")));
 
+        btnYes = findViewById(R.id.btnYes);
         btnYes.setOnClickListener(view -> {
             onClickBtnYes();
         });
+
+        btnNo = findViewById(R.id.btnNo);
         btnNo.setOnClickListener(view -> {
             onClickBtnNo();
         });
+
+        btnResult = findViewById(R.id.btnResult);
         btnResult.setOnClickListener(view -> {
             super.onBackPressed();
         });
@@ -106,7 +108,6 @@ public class DetMain extends AppCompatActivity {
         if (dataFromBase.getGroupId() > 0) {
             tvPrev.setText(dataFromBase.previewText());
         } else {
-
             tvResult.setText(dataFromBase.progressText());
             ivResult.setImageResource(dataFromBase.getImageId());
 

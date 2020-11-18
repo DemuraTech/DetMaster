@@ -17,26 +17,14 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    // todo нужны ли здесь поля?
-    Button btnAnimal, btnTree;
-
-    // todo в строку с переносами перечислять не принято, да и вроде не очень практично
-    //  лучше отдельными объявлениями
-    final String
-            valueOfAnimals = "1",
-            valueOfBirds = "2",
-            group = "group";
+    final String valueOfAnimals = "1";
+    final String valueOfBirds = "2";
+    final String group = "group";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-        // todo: объявления всегда лучше переносить к месту использования
-        //  https://habr.com/ru/post/59570/ правило 1
-        btnAnimal = findViewById(R.id.btnAnimal);
-        btnTree = findViewById(R.id.btnTheory);
 
         Button btnBird = findViewById(R.id.btnBird);
         btnBird.setOnClickListener(view -> {
@@ -45,19 +33,16 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-
-        //todo может быть достаточно будет как я исправил выше?
+        Button btnAnimal = findViewById(R.id.btnAnimal);
         btnAnimal.setOnClickListener(view -> {
             Intent intent = new Intent(this, DetMain.class);
             intent.putExtra(group, valueOfAnimals);
             startActivity(intent);
         });
 
-        btnTree.setOnClickListener((view) -> {
+        Button btnTheory = findViewById(R.id.btnTheory);
+        btnTheory.setOnClickListener((view) -> {
             Toast.makeText(this, "Lambda function", Toast.LENGTH_SHORT).show();
         });
-
-
-
     }
 }

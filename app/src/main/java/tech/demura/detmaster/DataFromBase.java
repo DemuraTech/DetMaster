@@ -27,7 +27,7 @@ public class DataFromBase {
     // todo static?
     private static int
             id = 1,
-            group1,
+            group1 = 1,
             group_id = 1,
             if_not = 0,
             next_id = 0,
@@ -41,16 +41,7 @@ public class DataFromBase {
     private DBHelper dbHelper;
 
     DataFromBase(Context current) {
-        context = current;
-        dbHelper = new DBHelper(context);
-        // todo Прописать создание в class Application через наследника
-        dbHelper.createDB();
-        db = dbHelper.openBase();
-
-        cursor = db.query(DBHelper.TABLE, null, null, null, null, null, null);
-        cursor.moveToFirst();
-
-        // todo почему не перенести присвоение начальных значений выше?
+        group1 = 1;
         id = 1;
         group_id = 1;
         if_not = 0;
@@ -59,6 +50,12 @@ public class DataFromBase {
         family = 0;
         genus = 0;
         species = 0;
+
+        context = current;
+        dbHelper = new DBHelper(context);
+        db = dbHelper.openBase();
+
+        setGroup1(1);
 
         //todo получение самого первого значения?
         ID_INDEX = cursor.getColumnIndex(DBHelper.ID);
@@ -74,63 +71,97 @@ public class DataFromBase {
         IMAGE_PATH_INDEX = cursor.getColumnIndex(DBHelper.IMAGE_PATH);
     }
 
-    //todo group1 = group2? при этом метод называется setGroup1
-    public void setGroup1(int group2) {
-        Log.d("log", "setGroup1 starting");
-        group1 = group2;
+    public void setGroup1(int group) {
+        group1 = group;
+        String query = String.format("%s=%d AND %s=%d", DBHelper.GROUP1, group1, DBHelper.GROUP_ID, group_id);
+        cursor = db.query(DBHelper.TABLE, null, query, null, null, null, null);
+        cursor.moveToFirst();
     }
 
     public void clickedYes() {
-        Log.d("log", "clickedYes starting");
         group_id = cursor.getInt(NEXT_ID_INDEX);
         order = cursor.getInt(ORDER_INDEX);
         family = cursor.getInt(FAMILY_INDEX);
         genus = cursor.getInt(GENUS_INDEX);
         species = cursor.getInt(SPECIES_INDEX);
+
+
+        String query = String.format("%s=%d AND %s=%d", DBHelper.GROUP1, group1, DBHelper.GROUP_ID, group_id);
+        if (group_id == 1 || group_id == -1) {
+            if (order > 0) {
+                query += String.format(" AND %s=%d", DBHelper.ORDER1, order);
+            }
+            if (family > 0) {
+                query += String.format(" AND %s=%d", DBHelper.FAMILY, family);
+            }
+            if (genus > 0) {
+                query += String.format(" AND %s=%d", DBHelper.GENUS, genus);
+            }
+            if (species > 0) {
+                query += String.format(" AND %s=%d", DBHelper.SPECIES, species);
+            }
+        } else {
+            int id = cursor.getInt(ID_INDEX);
+            id++;
+            query += String.format(" AND %s=%d", DBHelper.ID, id);
+        }
+        cursor = db.query(DBHelper.TABLE, null, query, null, null, null, null);
+        cursor.moveToFirst();
     }
 
     public void clickedNo() {
-        Log.d("log", "clickedNo starting " + cursor.getInt(IF_NOT_INDEX));
+        int oldGroup_id = group_id;
+        int id = cursor.getInt(ID_INDEX);
+        int newId;
         group_id = cursor.getInt(IF_NOT_INDEX);
+        newId = id + (group_id - oldGroup_id);
+        String query = String.format("%s=%d AND %s=%d AND %s=%d", DBHelper.GROUP1, group1, DBHelper.GROUP_ID, group_id, DBHelper.ID, newId);
+        cursor = db.query(DBHelper.TABLE, null, query, null, null, null, null);
+        cursor.moveToFirst();
     }
 
     public String getSign(String query) {
-        Log.d("log", "getSignQuery starting");
-        cursor = db.query(DBHelper.TABLE, null, query, null, null, null, null);
-        cursor.moveToFirst();
-        return cursor.getString(SIGN_INDEX);
+        Cursor supCursor;
+        supCursor = db.query(DBHelper.TABLE, null, query, null, null, null, null);
+        supCursor.moveToFirst();
+        return supCursor.getString(SIGN_INDEX);
     }
 
     public String getSign(String query, int INDEX) {
-        Log.d("log", "getSignIndex starting");
-        cursor = db.query(DBHelper.TABLE, null, query, null, null, null, null);
-        cursor.moveToFirst();
-        return cursor.getString(INDEX);
+        Cursor supCursor;
+        supCursor = db.query(DBHelper.TABLE, null, query, null, null, null, null);
+        supCursor.moveToFirst();
+        return supCursor.getString(INDEX);
+    }
+
+    public String getSign(Cursor supCursor) {
+        return supCursor.getString(SIGN_INDEX);
+    }
+
+    public String getSign(Cursor supCursor, int INDEX) {
+        return supCursor.getString(INDEX);
     }
 
     public int getGroupId() {
-        Log.d("log", "getGroupId starting ");
         return group_id;
     }
 
     public int getImageId() {
         Log.d("log", "getImageId starting");
         String query = "";
-        query = DBHelper.GROUP1 + "=" + group1
-                + " AND " + DBHelper.GROUP_ID + "=" + -1
-                + " AND " + DBHelper.NEXT_ID + "=" + -1;
+        query = String.format("%s=%d AND %s=%d AND %s=%d", DBHelper.GROUP1, group1, DBHelper.GROUP_ID, -1, DBHelper.NEXT_ID, -1);
 
         if (order > 0) {
-            query += " AND " + DBHelper.ORDER1 + "=" + order;
+            query += String.format(" AND %s=%d", DBHelper.ORDER1, order);
         }
         if (family > 0) {
-            query += " AND " + DBHelper.FAMILY + "=" + family;
+            query += String.format(" AND %s=%d", DBHelper.FAMILY, family);
         }
         if (genus > 0) {
-            query += " AND " + DBHelper.GENUS + "=" + genus;
+            query += String.format(" AND %s=%d", DBHelper.GENUS, genus);
         }
         if (species > 0) {
-            query += " AND " + DBHelper.SPECIES + "=" + species;
+            query += String.format(" AND %s=%d", DBHelper.SPECIES, species);
         }
         int resId = context.getResources().getIdentifier(getSign(query, IMAGE_PATH_INDEX), "drawable", context.getPackageName());
         return resId;
@@ -161,56 +192,32 @@ public class DataFromBase {
             query += String.format(" AND %s=%d", DBHelper.SPECIES, species);
             progress += String.format("%s", getSign(query));
         }
-        if(group_id < 0){
+        if (group_id < 0) {
             preText = "Результат:\n";
         }
         return preText + progress;
     }
 
-
     public String previewText() {
-        Log.d("log", "previewText starting");
-        String result = "", query = "";
-        query = String.format("%s=%d AND %s=%d", DBHelper.GROUP1, group1, DBHelper.GROUP_ID, group_id);
-        if (order > 0) {
-            query += String.format(" AND %s=%d", DBHelper.ORDER1, order);
-        }
-        if (family > 0) {
-            query += String.format(" AND %s=%d", DBHelper.FAMILY, family);
-        }
-        if (genus > 0) {
-            query += String.format(" AND %s=%d", DBHelper.GENUS, genus);
-        }
-        result = group_id + ".(" + getSign(query, IF_NOT_INDEX) + ")-" + getSign(query);
-
-        return result;
+        return group_id + ".(" + getSign(cursor, IF_NOT_INDEX) + ")-" + getSign(cursor);
     }
 
     @SuppressLint("DefaultLocale")
     public ArrayList<String> getStringList() {
-        Log.d("log", "getStringList starting");
-
-        String cmQuery = String.format("%s=%d AND %s=-1", DBHelper.GROUP1, group1, DBHelper.GROUP_ID);
-
-        if (order == 0) {
-            cmQuery += String.format(" AND %s>0 AND %s=0", DBHelper.ORDER1, DBHelper.FAMILY);
-        } else if (family == 0) {
-            cmQuery += String.format(" AND %s=%d AND %s>0 AND %s=0", DBHelper.ORDER1, order, DBHelper.FAMILY, DBHelper.GENUS);
-        } else if (genus == 0) {
-            cmQuery += String.format(" AND %s=%d AND %s=%d AND %s>0 AND %s=0", DBHelper.ORDER1, order, DBHelper.FAMILY, family, DBHelper.GENUS, DBHelper.SPECIES);
-        } else if (species == 0) {
-            cmQuery += String.format(" AND %s=%d AND %s=%d AND %s=%d AND %s>0", DBHelper.ORDER1, order, DBHelper.FAMILY, family, DBHelper.GENUS, genus, DBHelper.SPECIES);
-        }
         ArrayList<String> result = new ArrayList<>();
-        Cursor cursor1;
-        cursor1 = db.query(DBHelper.TABLE, null, cmQuery, null, null, null, null);
-        if (cursor1.getCount() == 0) {
-            return result;
-        }
-        cursor1.moveToFirst();
-        for (int i = 0; i < cursor1.getCount(); i++) {
-            result.add(cursor1.getString(SIGN_INDEX));
-            cursor1.moveToNext();
+        if (order == 0) {
+            Cursor supCursor;
+            String cmQuery = String.format("%s=%d AND %s=-1", DBHelper.GROUP1, group1, DBHelper.GROUP_ID);
+            cmQuery += String.format(" AND %s>0 AND %s=0", DBHelper.ORDER1, DBHelper.FAMILY);
+            supCursor = db.query(DBHelper.TABLE, null, cmQuery, null, null, null, null);
+            if (supCursor.getCount() == 0) {
+                return result;
+            }
+            supCursor.moveToFirst();
+            for (int i = 0; i < supCursor.getCount(); i++) {
+                result.add(supCursor.getString(SIGN_INDEX));
+                supCursor.moveToNext();
+            }
         }
         return result;
     }
